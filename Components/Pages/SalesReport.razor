@@ -1,0 +1,106 @@
+@page "/generate-reports"
+@inject ISnackbar Snackbar
+@inject OrderServices OrderServices
+@using QuestPDF.Fluent
+@inject ReportServices ReportServices
+
+<MudText Typo="Typo.h6" Color="Color.Warning">Select According To Your Report Prefences</MudText>
+<div style="width: 300px;" class="mb-5 d-flex flex-row flex-wrap">
+
+    <div class="my-5 me-3">
+        <MudSelect @bind-Value="_reportType" Margin="Margin.Dense" T="string" Label="Report Type" Variant="Variant.Text">
+            <MudSelectItem Value="@("Daily")" />
+            <MudSelectItem Value="@("Monthly")" />
+        </MudSelect>
+    </div>
+
+    <div>
+        <MudDatePicker Label="" Editable="true" @bind-Date="_date" Placeholder="Select Date" />
+    </div>
+</div>
+
+
+<MudButton Variant="Variant.Filled" Size="Size.Small" style="background-color: #8B4513;color:white" OnClick="HandleGenerateReport">Generate Report</MudButton>
+
+@code {
+    [CascadingParameter] private GlobalState _globalState { get; set; }
+
+    private DateTime? _date { set; get; }
+    private string _reportType { set; get; }
+
+    protected override void OnInitialized()
+    {
+        _globalState.AppBarTitle = "Bislerium Reports";
+    }
+
+    // This method Generates the PDF
+    private void HandleGenerateReport()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(_reportType))
+            {
+                Snackbar.Add("Please Select Report Type", Severity.Error);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_date.ToString()))
+            {
+                Snackbar.Add("Please Select date", Severity.Error);
+                return;
+            }
+
+            // This report date is converted to respective format
+            
+            String reportDate;
+
+            if (_reportType == "Daily")
+            {
+                reportDate = _date?.ToString("dd-MM-yyyy");
+            }
+            else
+            {
+                reportDate = _date?.ToString("MM-yyyy");
+            }
+
+           
+            List<Order> orders = ReportServices.GenerateOrderList(_reportType, reportDate);
+
+            if (orders.Count == 0)
+            {
+                Snackbar.Add("No Orders Founds. Please select another date", Severity.Error);
+                return;
+            };
+
+        
+            Dictionary<string, List<OrderCart>> orderItems = ReportServices.GenerateMostPurchasedCoffeeAndAddInsList(orders);
+
+            Report _report = new()
+            {
+                ReportType = _reportType,
+                ReportDate = reportDate,
+                Orders = orders,
+                CoffeeList = orderItems["coffees"],
+                AddInsList = orderItems["add-ins"],
+                TotalRevenue = Math.Round(orders.Sum(_order => (_order.OrderTotalAmount - _order.DiscountAmount)), 2)
+            };
+
+            // PDF Setup and Generation
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+            ReportDocument document = new ReportDocument(_report);
+            string filePath = Path.Combine(AppUtils.GetDesktopDirectoryPath(), "BisleriumReport.PDF");
+            document.GeneratePdf(filePath);
+
+            Snackbar.Add("Reports is generated sucessfully. Please look into the destinated folder with naming BisleriumReport.Pdf", Severity.Success);
+
+
+            // _date = null;
+            // _reportType = null;
+
+        } catch(Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+
+        }
+    }
+}

@@ -1,0 +1,35 @@
+﻿@page "/"
+@inject NavigationManager NavManager
+
+
+@code {
+
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        if (_globalState.CurrentUser == null)
+        {
+            NavManager.NavigateTo("/sign-in");
+        }
+        else
+        {
+            if (_globalState.CurrentUser.Role.ToString() == "BesleriumAdmin")
+            {
+                NavManager.NavigateTo("/sales-transactions");
+                _globalState.AppBarTitle = "Sales Transactions";
+
+            }
+            else
+            {
+                NavManager.NavigateTo("/coffee-list");
+                _globalState.AppBarTitle = "Items";
+            }
+
+        }
+    }
+
+}
+

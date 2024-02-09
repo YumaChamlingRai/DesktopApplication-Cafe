@@ -1,0 +1,93 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\app.css",
+      "PackagePath": "staticwebassets\\css\\app.css"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\css\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\FONT-LICENSE",
+      "PackagePath": "staticwebassets\\css\\open-iconic"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\ICON-LICENSE",
+      "PackagePath": "staticwebassets\\css\\open-iconic"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\README.md",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\README.md"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\css\\open-iconic-bootstrap.min.css"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.eot",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.eot"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.otf",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.otf"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.svg",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.svg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.ttf",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.ttf"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\css\\open-iconic\\font\\fonts\\open-iconic.woff",
+      "PackagePath": "staticwebassets\\css\\open-iconic\\font\\fonts\\open-iconic.woff"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\images\\1.webp",
+      "PackagePath": "staticwebassets\\images\\1.webp"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\images\\backgroundIMAGE.jpg",
+      "PackagePath": "staticwebassets\\images\\backgroundIMAGE.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\images\\logo.jpg",
+      "PackagePath": "staticwebassets\\images\\logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\images\\logo.png",
+      "PackagePath": "staticwebassets\\images\\logo.png"
+    },
+    {
+      "Id": "C:\\Users\\Dell\\Documents\\22015804 YUMA RAI APPLICATION DEVELOPMENT\\Bislerium_Cafe\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.Bislerium_Cafe.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.build.Bislerium_Cafe.props",
+      "PackagePath": "build\\Bislerium_Cafe.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.buildMultiTargeting.Bislerium_Cafe.props",
+      "PackagePath": "buildMultiTargeting\\Bislerium_Cafe.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0-windows10.0.19041.0\\win10-x64\\staticwebassets\\msbuild.buildTransitive.Bislerium_Cafe.props",
+      "PackagePath": "buildTransitive\\Bislerium_Cafe.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

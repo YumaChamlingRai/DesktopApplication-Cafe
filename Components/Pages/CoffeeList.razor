@@ -1,0 +1,136 @@
+@page "/coffee-list"
+@inject CoffeeServices CoffeeServices
+@inject NavigationManager NavigationManager
+@inject OrderCartServices OrderItemServices
+@inject ISnackbar Snackbar
+@inject IDialogService Dialog
+
+<MudButton Variant="Variant.Filled" Color="Color.Warning" EndIcon="@Icons.Material.Filled.Add"
+           class="mb-5" OnClick="OpenAddCoffeeTypeDialog"
+           Disabled="@isUserStaff">Add New Coffee</MudButton>
+
+<MudTable Items="@Elements"
+          Dense="@dense"
+          Hover="@hover"
+          Bordered="@bordered"
+          Striped="@striped"
+          Filter="new Func<Coffee,bool>(FilterFunc1)">
+
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Bislerium Coffee Items</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.TwoTone.ManageSearch" IconSize="Size.Medium" Class="mt-0">Search Coffee</MudTextField>
+    </ToolBarContent>
+
+
+    <HeaderContent>
+        <MudTh>Coffee Names</MudTh>
+        <MudTh>Price</MudTh>
+        <MudTh>Edit</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd DataLabel="CoffeeType">@context.CoffeeType</MudTd>
+            <MudTd DataLabel="Price">Rs.@context.Price</MudTd>
+            <MudTd DataLabel="Action">
+                <MudIconButton Style="color:#8C1313" Icon="@Icons.Material.TwoTone.ShoppingCartCheckout" aria-label="Cart" OnClick="@(() => handleAddItemInCart(context.Id, context.Price, context.CoffeeType))"></MudIconButton>
+                <MudIconButton Style="color:#3E92A3" Icon="@Icons.Material.TwoTone.EditNote" aria-label="Edit"
+                               OnClick="@(() => handleEdit(context.Id))"
+                               Disabled="@isUserStaff">
+                    
+                </MudIconButton>
+
+                <MudIconButton Style="color:#255118" Icon="@Icons.Material.TwoTone.DeleteSweep" aria-label="Delete"
+                               OnClick="@(() => handleDelete(context.Id))"
+                               Disabled="@isUserStaff">
+
+                </MudIconButton>
+               
+
+            </MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+
+    @code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+    private bool isUserStaff { get; set; }
+
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string _searchString1 = "";
+
+    private IEnumerable<Coffee> Elements = new List<Coffee>();
+
+    protected override void OnInitialized()
+    {
+        Elements = CoffeeServices.GetCoffeeListFromJsonFile();
+        isUserStaff = _globalState.CurrentUser.Role.ToString() == "Staff";
+        _globalState.AppBarTitle = "Bislerium Coffeee";
+    }
+
+    private void handleEdit(Guid cofeeID)
+    {
+        NavigationManager.NavigateTo($"/coffee-list/{cofeeID}");
+    }
+
+    private void handleAddItemInCart(Guid coffeeID, double itemPrice, string coffeeType)
+    {
+        OrderItemServices.AddItemInOrderItemsList(_globalState.OrderItems, coffeeID, coffeeType, "coffee", itemPrice);
+
+        Snackbar.Add($"{coffeeType} is Added to cart", Severity.Warning);
+    }
+
+    private bool FilterFunc1(Coffee element) => FilterFunc(element, _searchString1);
+
+    private bool FilterFunc(Coffee element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.CoffeeType.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Price.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = CoffeeServices.GetCoffeeListFromJsonFile();
+    }
+
+    private async Task OpenAddCoffeeTypeDialog()
+    {
+        DialogParameters dialogParameters = new() {
+            {"_globalState", _globalState },
+            {"ChangeParentState", new Action(Reload)},
+        };
+
+        Dialog.ShowAsync<AddCoffeeTypeDialog>("Add Coffee Type", dialogParameters);
+    }
+
+    private void Reload()
+    {
+        Elements = CoffeeServices.GetCoffeeListFromJsonFile();
+
+        StateHasChanged();
+    }
+
+    private void handleDelete(Guid coffeeID)
+    {
+        Elements = CoffeeServices.DeleteCoffeeType(coffeeID);
+
+        Snackbar.Add("Coffee is Deleted Sucessfully", Severity.Warning);
+    }
+}

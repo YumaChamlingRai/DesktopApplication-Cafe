@@ -1,0 +1,36 @@
+﻿@inherits LayoutComponentBase
+@inject RoleUserServices UserServices
+@layout ParentLayout
+
+
+<MudAppBar Style="background-color:#5B240C">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Style="background-color:#5B240C; color:white" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    <h3 class="m-0">@_globalState.AppBarTitle</h3>
+    <MudSpacer />
+    </MudAppBar>
+
+<MudDrawer @bind-Open="@_drawerOpen" >
+    <NavMenu />
+</MudDrawer>
+
+<MudMainContent>
+    <div class="px-5 pt-6">
+          @Body
+    </div>
+</MudMainContent>
+
+
+
+@code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+}
+

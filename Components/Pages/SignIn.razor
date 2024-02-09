@@ -1,0 +1,99 @@
+@page "/sign-in"
+
+@inject RoleUserServices UserServices
+@inject NavigationManager NavManager
+@layout EmptyLayout
+
+
+<div class="d-flex justify-center align-items-center vh-100" style="background-image: url('images/backgroundIMAGE.jpg'); background-size: cover; background-position: center center;">
+
+    <div class="border border-light w-40 px-8 py-10" style="background-color: rgba(255, 255, 255, 0.9);">
+        <CafeInfo /> 
+
+        <!-- Form -->
+        <div class="d-flex flex-column gap-y-3 mt-8">
+
+            @if (!string.IsNullOrEmpty(_errorMessage))
+            {
+                <MudAlert Severity="Severity.Error">@_errorMessage</MudAlert>
+            }
+            else if (!string.IsNullOrEmpty(_sucessMessage))
+            {
+                <MudAlert Severity="Severity.Success">@_sucessMessage</MudAlert>
+            }
+
+            <div class="d-flex flex-row justify-content-between gap-x-3">
+                <MudTextField @bind-Value="_username" Label="User Name" Variant="Variant.Outlined"></MudTextField>
+
+                <MudTextField @bind-Value="_password" Label="Passsword" Variant="Variant.Outlined" InputType="@InputType.Password"></MudTextField>
+                
+            </div>
+
+            <MudSelect @bind-Value="_role" T="string" Label="Select Your Role" AnchorOrigin="Origin.BottomCenter" OpenIcon="@Icons.Material.Filled.Person" Style="color:#8B4513">
+                @foreach (Role role in Enum.GetValues(typeof(Role)))
+                {
+                    <MudSelectItem Value="@role.ToString()" />
+                }
+            </MudSelect>
+
+            <MudButton Variant="Variant.Filled" DisableElevation="true" @onclick="_logInHandler" Class="mt-3" style="background-color: #8B4513;color:white">
+                LogIn
+            </MudButton>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    public string ReadOnly { get; set; } = "Welcome BisleriumAdmin Have A Good Day";
+}
+@code {
+
+    private string _path = AppUtils.GetDesktopDirectoryPath();
+
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+    private string _errorMessage = "";
+    private string _sucessMessage = "";
+
+    private string _username { get; set; } = "";
+    private string _password { get; set; } = "";
+    private string _role { get; set; } = "";
+
+    private RoleUser _currentUser { get; set; }
+
+    private void _logInHandler()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(_username) || string.IsNullOrEmpty(_password) || string.IsNullOrEmpty(_role))
+            {
+                _errorMessage = "Please fill up all the fields";
+                return;
+            }
+
+            _currentUser = UserServices.LogIn(_username, _password, _role);
+            _globalState.CurrentUser = _currentUser;
+
+
+            if (_currentUser != null)
+            {
+                NavManager.NavigateTo(_currentUser.HasInitialPasswordChanged ? "/" : "/change-password");
+            }
+
+            _errorMessage = "";
+            _sucessMessage = "Authentication Sucessfull";
+            _username = "";
+            _password = "";
+            _role = "";
+        }
+        catch (Exception e)
+        {
+            _errorMessage = e.Message;
+            Console.WriteLine(e);
+        }
+    }
+}

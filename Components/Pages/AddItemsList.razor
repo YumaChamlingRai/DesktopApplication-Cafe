@@ -1,0 +1,137 @@
+@page "/addIn-items"
+@using Bislerium_Cafe.Models;
+@using Bislerium_Cafe.Components.Pages.Dialogs;
+@inject AddInsServices AddInItemsServices
+@inject NavigationManager NavigationManager
+@inject OrderCartServices OrderItemServices
+@inject ISnackbar Snackbar
+@inject IDialogService Dialog
+
+<MudButton Variant="Variant.Filled" Color="Color.Warning" EndIcon="@Icons.Material.Filled.Add" Class="mb-5"
+           OnClick="OpenAddItemDialog"
+           Disabled="@isUserStaff">Add New Add-Ins</MudButton>
+
+<MudTable Items="@Elements"
+          Dense="@dense"
+          Hover="@hover"
+          Bordered="@bordered"
+          Striped="@striped"
+          Filter="new Func<AddIns,bool>(FilterFunc1)">
+
+    <ToolBarContent>
+        <MudText>Add-In Items List</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.TwoTone.ManageSearch" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+
+
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Price</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Price">Rs.@context.Price</MudTd>
+            <MudTd DataLabel="Action">
+                <MudIconButton Style="color:#8C1313" Icon="@Icons.Material.TwoTone.ShoppingCartCheckout" aria-label="Cart" OnClick="@(() => handleAddItemInCart(context.Id, context.Price, context.Name))"></MudIconButton>
+
+                <MudIconButton Style="color:#3E92A3" Icon="@Icons.Material.TwoTone.EditNote" aria-label="Edit"
+                               OnClick="@(() => handleEdit(context.Id))"
+                               Disabled="@isUserStaff">
+                </MudIconButton>
+
+                <MudIconButton Style="color:#255118" Icon="@Icons.Material.TwoTone.DeleteSweep" aria-label="Delete"
+                               OnClick="@(() => handleDelete(context.Id))"
+                               Disabled="@isUserStaff">
+                </MudIconButton>
+
+            </MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+
+
+@code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+    private bool isUserStaff { get; set; }
+
+    private void handleEdit(Guid addInItemID)
+    {
+        NavigationManager.NavigateTo($"/addIn-items/{addInItemID}");
+    }
+
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string _searchString1 = "";
+
+    private IEnumerable<AddIns> Elements = new List<AddIns>();
+
+    protected override void OnInitialized()
+    {
+        Elements = AddInItemsServices.GetAddInItemsListListFromJsonFile();
+        isUserStaff = _globalState.CurrentUser.Role.ToString() == "Staff";
+        _globalState.AppBarTitle = "Add-Ins For Coffee";
+    }
+
+    private void handleAddItemInCart(Guid addInItemID, double itemPrice, string addInItemName)
+    {
+        OrderItemServices.AddItemInOrderItemsList(_globalState.OrderItems, addInItemID, addInItemName, "add-in", itemPrice);
+
+        Snackbar.Add($"{addInItemName} is Added to cart sucessfully", Severity.Warning);
+    }
+
+    private bool FilterFunc1(AddIns element) => FilterFunc(element, _searchString1);
+
+    private bool FilterFunc(AddIns element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Price.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = AddInItemsServices.GetAddInItemsListListFromJsonFile();
+    }
+
+    private async Task OpenAddItemDialog()
+    {
+        DialogParameters dialogParameters = new() {
+            {"_globalState", _globalState },
+            {"ChangeParentState", new Action(Reload)},
+        };
+
+        Dialog.ShowAsync<AddAddInItemsDialog>("Add Add-In Item", dialogParameters);
+    }
+
+    private void Reload()
+    {
+        Elements = AddInItemsServices.GetAddInItemsListListFromJsonFile();
+
+        StateHasChanged();
+    }
+
+    private void handleDelete(Guid itemID)
+    {
+        Elements = AddInItemsServices.DeletAddInItem(itemID);
+
+        Snackbar.Add("Item is Deleted Sucessfully", Severity.Warning);
+    }
+}

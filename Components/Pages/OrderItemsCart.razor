@@ -1,0 +1,117 @@
+@page "/cart-items"
+@inject CoffeeServices CoffeeServices
+@inject OrderCartServices OrderItemServices
+@inject AddInsServices AddInItemsServices
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+
+@if (Elements.Count() == 0)
+{
+    <MudAlert Severity="Severity.Info" Color="Color.Warning"  Variant="Variant.Filled">WOhooo!!The Cart Seems To Be Empty Add Some Coffess To It.</MudAlert>
+} else
+{
+
+    <MudTable Items="@Elements"
+              Dense="@dense"
+              Hover="@hover"
+              Bordered="@bordered"
+              Striped="@striped">
+
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Bislerium Order List</MudText>
+            <MudSpacer />
+            <MudText Typo="Typo.subtitle1">Total Amount: <b>Rs.@Math.Round(_totalAmount, 2)</b></MudText>
+        </ToolBarContent>
+
+
+        <HeaderContent>
+            <MudTh>Item Name</MudTh>
+            <MudTh>Item Type</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Quantity</MudTh>
+            <MudTh>Total</MudTh>
+            <MudTh>Edit</MudTh>
+        </HeaderContent>
+
+
+        <RowTemplate>
+            <MudTd DataLabel="CoffeeType">@context.ItemName</MudTd>
+                <MudTd DataLabel="Item Type">@context.ItemType</MudTd>
+                <MudTd DataLabel="Price">Rs.@context.Price</MudTd>
+
+                <MudTd DataLabel="Quantity">
+
+                    <MudIconButton Icon="@Icons.Material.Filled.Remove" aria-label="subtract" OnClick="@(() => ManageQuantity(context.OrderItemID, "subtract"))"></MudIconButton>
+
+                    <span>
+                        @context.Quantity
+                </span>
+
+                <MudIconButton Icon="@Icons.Material.Filled.Add" aria-label="add" OnClick="@(() => ManageQuantity(context.OrderItemID, "add"))"></MudIconButton>
+
+
+            </MudTd>
+
+            <MudTd DataLabel="Price">Rs.@Math.Round(context.TotalPrice, 2)</MudTd>
+                <MudTd DataLabel="Action">
+                    <MudIconButton Color="Color.Error" Icon="@Icons.Material.TwoTone.RemoveShoppingCart" aria-label="delete" OnClick="@(() => handleDeleteCartItem(context.OrderItemID))"></MudIconButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+
+    <div class="mt-5">
+        <MudButton Variant="Variant.Filled" Class="mr-5" OnClick="clearCart">Clear Cart</MudButton>
+        <MudButton Variant="Variant.Filled" style="background-color: #8B4513;color:white"
+           OnClick="@(() => NavigationManager.NavigateTo("/checkout"))"
+        >Checkout</MudButton>
+    </div>
+}
+
+
+@code {
+    [CascadingParameter]
+    private GlobalState _globalState { set; get; }
+
+    private double _totalAmount { set; get; } = 0;
+
+
+    private IEnumerable<OrderCart> Elements = new List<OrderCart>();
+
+    private Coffee _coffee { set; get; }
+
+
+    private void clearCart()
+    {
+        _globalState.OrderItems.Clear();
+        Snackbar.Add("Cart is cleared", Severity.Success);
+    }
+
+    private void handleDeleteCartItem(Guid orderItemID)
+    {
+        OrderItemServices.DeleteItemInOrderItemsList(_globalState.OrderItems, orderItemID);
+        _totalAmount = OrderItemServices.CalculateTotalAmount(Elements);
+        Snackbar.Add($"The Item is removed from the cart sucessfully", Severity.Success);
+    }
+
+    private void ManageQuantity(Guid orderItemID, string action)
+    {
+        OrderItemServices.ManageQuantityOfOrderItem(_globalState.OrderItems, orderItemID, action);
+        _totalAmount = OrderItemServices.CalculateTotalAmount(Elements);
+
+    }
+
+    protected override void OnInitialized()
+    {
+        Elements = _globalState.OrderItems;
+        _globalState.AppBarTitle = "Cart Items";
+        _totalAmount = OrderItemServices.CalculateTotalAmount(Elements);
+
+    }
+
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+
+}

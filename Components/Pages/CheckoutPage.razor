@@ -1,0 +1,304 @@
+@page "/checkout"
+@inject CustomerServices CustomerService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject OrderCartServices OrderItemServices
+@inject CustomerServices CustomerServices
+@inject OrderServices OrderServices
+
+@if (_step == 1)
+{
+    <MudText Typo="Typo.h6">Enter Customer Phone Number To Check Membership Details</MudText>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Class="my-3">@_errorMessage</MudAlert>
+    }
+
+
+    <div style="width:400px;" class="mt-5">
+        <MudTextField @bind-Value="_customerPhoneNum" Label="Customers Phone Number" Variant="Variant.Outlined" Class="mb-5" Margin="Margin.Dense"></MudTextField>
+    </div>
+
+    <MudButton Variant="Variant.Filled" DisableElevation="true" style="background-color: #8B4513;color:white" @onclick="@(() => NavigationManager.NavigateTo("/cart-items"))" Class="mr-5">Go Back</MudButton>
+
+    <MudButton Variant="Variant.Filled" DisableElevation="true" style="background-color: #8B4513;color:white" @onclick="handleCheckMembership">Verify Customer Membership</MudButton>
+}
+
+@if (_step == 2)
+{
+    <MudText Typo="Typo.h6">Enter Customer Credentials</MudText>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Class="mt-3 mb-5">@_errorMessage</MudAlert>
+    }
+
+
+    <div style="width:400px;" class="mt-5">
+        <MudTextField @bind-Value="_customer.CustomerPhoneNum" Label="Customer Phone Number" Variant="Variant.Filled" Class="mb-5" Margin="Margin.Dense"></MudTextField>
+        <MudTextField @bind-Value="_customer.CustomerName" Label="Customer Name" Variant="Variant.Filled" Class="mb-5" Margin="Margin.Dense"></MudTextField>
+        <MudTextField @bind-Value="_customer.CustomerAddress" Label="Customer Address" Variant="Variant.Filled" Class="mb-5" Margin="Margin.Dense"></MudTextField>
+    </div>
+
+    <MudButton Variant="Variant.Filled" DisableElevation="true" style="background-color: #8B4513;color:white" @onclick="@(() => _step--)" Class="mr-5">Back</MudButton>
+    <MudButton Variant="Variant.Filled" DisableElevation="true" style="background-color: #8B4513;color:white" @onclick="validateUserDetails">Proceed</MudButton>
+}
+
+@if (_step == 3)
+{
+    <MudContainer>
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h4" Align="Align.Center">Bislerum Cafe Invoice</MudText>
+                <MudSpacer />
+                <MudText Typo="Typo.body1" Align="Align.Center">Date: @DateTime.Now</MudText>
+                </MudCardHeader>
+
+                <MudDivider />
+
+
+                <MudCardContent>
+                    <MudText Typo="Typo.h6">Customer Information:</MudText>
+
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" md="4">
+                            <MudText Typo="Typo.body2">Customer Name: @_customer.CustomerName</MudText>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudText Typo="Typo.body2">Phone Number: @_customer.CustomerPhoneNum</MudText>
+                        </MudItem>
+                        <MudItem xs="12" md="4">
+                            <MudText Typo="Typo.body2">Address: @_customer.CustomerAddress</MudText>
+                        </MudItem>
+                    </MudGrid>
+
+
+                </MudCardContent>
+
+                <MudDivider />
+
+
+                <MudCardContent>
+                    <MudTable Items="@Elements"
+                              Dense="@dense"
+                              Hover="@hover"
+                              Bordered="@bordered"
+                              Striped="@striped"
+                              Class="border-0 shadow-none">
+
+                        <ToolBarContent>
+                            <MudText Typo="Typo.h6">Order Items List</MudText>
+                            <MudSpacer />
+                        </ToolBarContent>
+
+
+                        <HeaderContent>
+                            <MudTh>Item Name</MudTh>
+                            <MudTh>Item Type</MudTh>
+                            <MudTh>Price</MudTh>
+                            <MudTh>Quantity</MudTh>
+                            <MudTh>Total</MudTh>
+                        </HeaderContent>
+
+
+                        <RowTemplate>
+                            <MudTd DataLabel="CoffeeType">@context.ItemName</MudTd>
+                            <MudTd DataLabel="Item Type">@context.ItemType</MudTd>
+                            <MudTd DataLabel="Price">Rs.@context.Price</MudTd>
+
+                            <MudTd DataLabel="Quantity">
+                                @context.Quantity
+                        </MudTd>
+
+                        <MudTd DataLabel="Price">Rs.@context.TotalPrice</MudTd>
+
+                        </RowTemplate>
+
+                    </MudTable>
+
+                    <div class="d-flex justify-content-between mt-4">
+
+                        <div class="">
+                            @if (_totalFreeCoffeeCount != 0)
+                        {
+                            <MudText Typo="Typo.h6">Total Free Coffees: @_totalFreeCoffeeCount</MudText>
+                            <MudButton Color="Color.Info" Variant="Variant.Filled" Class="mt-2" OnClick="HandleFreeCoffeeRedeemption">Reedem</MudButton>
+                        }
+                    </div>
+
+                    <div>
+                        <MudText Typo="Typo.subtitle1">Total Amount: <b>Rs.@Math.Round(_totalAmount, 2)</b></MudText>
+                        <MudText Typo="Typo.subtitle1">Discount Amount: <b>Rs.@Math.Round(_discountAmount, 2)</b></MudText>
+                        <MudDivider DividerType="@DividerType.Middle" />
+                        <MudText Typo="Typo.subtitle1">Grand Total: <b>Rs.@Math.Round(_totalAmount - _discountAmount, 2)</b></MudText>
+                    </div>
+                </div>
+
+            </MudCardContent>
+
+            <MudDivider />
+
+
+
+            <MudDivider />
+
+            <div class="py-5 pl-3">
+                <MudButton Color="Color.Default" Variant="Variant.Filled" Class="mr-5" OnClick="handleGoBack">Go Back</MudButton>
+
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="handlePlaceOrder">Place Order</MudButton>
+            </div>
+
+        </MudCard>
+    </MudContainer>
+
+}
+
+
+@code {
+    [CascadingParameter] private GlobalState _globalState { get; set; }
+
+    private IEnumerable<OrderCart> Elements = new List<OrderCart>();
+
+    public double _totalAmount { get; set; } = 0;
+
+    //MudTable Configurations
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+
+
+    private string _customerPhoneNum { get; set; }
+    private MemberCustomer _customer { get; set; }
+
+    private string _errorMessage { set; get; }
+
+    private int _step = 1;
+    private bool _customerIsMember { get; set; } = false;
+
+    private int _totalFreeCoffeeCount { get; set; } = 0;
+    public double _discountAmount { get; set; } = 0;
+
+
+    //Validates the customer details to place order
+    private void validateUserDetails()
+    {
+        if (string.IsNullOrEmpty(_customer.CustomerName) || string.IsNullOrEmpty(_customer.CustomerAddress) || string.IsNullOrEmpty(_customer.CustomerPhoneNum))
+        {
+            _errorMessage = "Please fill up all the fields";
+            return;
+        }
+        _errorMessage = "";
+        _step++;
+    }
+
+    //Checks if customer is a member
+    private void handleCheckMembership()
+    {
+        if (string.IsNullOrEmpty(_customerPhoneNum))
+        {
+            _errorMessage = "Please enter your phone number";
+            return;
+        }
+
+        _customer = CustomerService.GetCustomerByPhoneNum(_customerPhoneNum);
+
+        if (_customer == null)
+        {
+            Snackbar.Add("Customer is not a member", Severity.Error);
+            _customer = new();
+            _customer.CustomerPhoneNum = _customerPhoneNum;
+            _step++;
+            return;
+        }
+
+        //Retrives membership benefits if customer is a member
+        _totalFreeCoffeeCount = CustomerServices.TotalFreeCoffeeCount(_customer.CustomerPhoneNum);
+        bool isCustomerRegularMember = CustomerServices.CheckIfCustomerIsReguralMember(_customer.CustomerPhoneNum);
+
+        if (isCustomerRegularMember)
+        {
+            _discountAmount = _totalAmount * 0.1;
+        }
+
+        Snackbar.Add("Customer is a member", Severity.Success);
+
+        _customerIsMember = true;
+        _step = 3;
+
+    }
+
+    // Handles the Coffee Redeemption after every 10 purchase
+    private void HandleFreeCoffeeRedeemption()
+    {
+        Dictionary<string, double> membershipBenifies = OrderItemServices.RedeemFreeCoffees(_totalFreeCoffeeCount, _globalState.OrderItems);
+
+        //Converting double to integer
+        int redeemedCoffeeCount = (int)membershipBenifies["redeemedCoffeeCount"];
+        _discountAmount = membershipBenifies["discount"];
+
+        CustomerService.UpdateRedeemedCoffeeCount(_customer.CustomerPhoneNum, redeemedCoffeeCount);
+
+        Snackbar.Add($"{redeemedCoffeeCount} coffees are redeemed.", Severity.Success);
+    }
+
+
+    protected override void OnInitialized()
+    {
+        _globalState.AppBarTitle = "Checkout Page";
+        Elements = _globalState.OrderItems;
+        _totalAmount = OrderItemServices.CalculateTotalAmount(Elements);
+    }
+
+    private void handleGoBack()
+    {
+        if (_customerIsMember)
+        {
+            _customerIsMember = false;
+            _step = 0;
+            NavigationManager.NavigateTo("/cart-items");
+            return;
+        }
+
+        _step--;
+    }
+
+    //Handles the process of placing an order,
+    private void handlePlaceOrder()
+    {
+        try
+        {
+            if (!_customerIsMember)
+            {
+                CustomerServices.AddCustomer(_customer);
+            }
+
+
+            Order order = new()
+                {
+                    CustomerID = _customer.CustomerID,
+                    CustomerName = _customer.CustomerName,
+                    CustomerPhoneNum = _customer.CustomerPhoneNum,
+                    EmployeeUserName = _globalState.CurrentUser.UserName,
+                    OrderTotalAmount = Math.Round(_totalAmount, 2),
+                    OrderItems = _globalState.OrderItems,
+                    DiscountAmount = Math.Round(_discountAmount, 2),
+                };
+
+
+            OrderServices.PlaceOrder(order);
+
+            Snackbar.Add("Order is Placed Sucessfully", Severity.Success);
+
+            _globalState.OrderItems = new List<OrderCart>();
+
+            NavigationManager.NavigateTo("/cart-items");
+
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+}

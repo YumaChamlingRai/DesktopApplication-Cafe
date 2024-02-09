@@ -1,0 +1,57 @@
+﻿@inject NavigationManager NavigationManager
+
+
+<div class="py-3 vh-100" Style="background-color:#5B240C">
+
+    <div class="d-flex flex-column justify-content-between h-100" Style="background-color:antiquewhite">
+
+        <MudPaper Elevation="0" Class="h-100" Style="background-color:antiquewhite">
+             <MyHomePage />
+            <MudDivider Class="my-3" />
+
+            <MudNavMenu Bordered="true" Margin="Margin.Dense" Color="Color.Warning" Class="pa-1" Style="background-color:antiquewhite">
+
+                @if (_isUserAdmin)
+                {
+                    <MudNavLink Match="NavLinkMatch.All" Href="/sales-transactions" Icon="@Icons.Material.Filled.FileCopy">Sales Transactions</MudNavLink>
+                }
+
+                <MudNavLink Match="NavLinkMatch.All" Href="/change-password" Icon="@Icons.Material.Filled.Lock">Password</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Href="/coffee-list" Icon="@Icons.Material.Filled.CoffeeMaker">Coffee</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Href="/addIn-items" Icon="@Icons.Material.Filled.PostAdd">Add-Ins For Coffee</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Href="/cart-items" Icon="@Icons.Material.TwoTone.ShoppingCart">Bislerium Cart</MudNavLink>
+
+                @if (_isUserAdmin)
+                {
+                    <MudNavLink Match="NavLinkMatch.All" Href="/generate-reports" Icon="@Icons.Material.TwoTone.PictureAsPdf">Reports</MudNavLink>
+                }
+            </MudNavMenu>
+
+        </MudPaper>
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Login" OnClick="logout" Class="mx-3 mb-3" Style="background-color:#EAB66B">LogOut</MudButton>
+    </div>
+
+</div>
+
+@code {
+    [CascadingParameter] private GlobalState _globalState { set; get; }
+
+    private bool _isUserAdmin { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _isUserAdmin = _globalState?.CurrentUser?.Role.ToString() == "BisleriumAdmin";
+    }
+
+    private void logout()
+    {
+        //OnClicking the logout button, the current user will be set to null, the order items will be cleared
+        // and the user will be navigated to sign-in page.
+        _globalState.CurrentUser = null;
+        _globalState.OrderItems = new();
+
+        NavigationManager.NavigateTo("/sign-in");
+    }
+}
+
+

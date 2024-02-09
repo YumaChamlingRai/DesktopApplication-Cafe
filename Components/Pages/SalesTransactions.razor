@@ -1,0 +1,105 @@
+@page "/sales-transactions"
+@inject OrderServices OrderServices
+
+<style>
+    .table-row {
+        font-size: 14px;
+    }
+</style>
+
+<MudTable Items="@Elements" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped"
+          Filter="new Func<Order,bool>(FilterFunc1)"
+          HorizontalScrollbar="true"
+          SortLabel="Sort By">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Sales Transactions</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.TwoTone.ManageSearch" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.OrderID)"> Order ID</MudTableSortLabel></MudTh>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.CustomerName)"> Customer Name</MudTableSortLabel></MudTh>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.CustomerPhoneNum)"> Customer Phone Number</MudTableSortLabel></MudTh>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.CustomerPhoneNum)"> UserName</MudTableSortLabel></MudTh>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.OrderDateTime)">  DateTime</MudTableSortLabel></MudTh>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.OrderTotalAmount)"> Order Total</MudTableSortLabel></MudTh>
+        <MudTh> <MudTableSortLabel SortBy="new Func<Order, object>(x => x.DiscountAmount)"> Discount t</MudTableSortLabel></MudTh>
+        <MudTh> Grand-Total</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Order ID" Class="table-row">@context.OrderID</MudTd>
+            <MudTd DataLabel="Customer Name" Class="table-row">
+                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Size="Size.Small">@context.CustomerName</MudChip>
+            </MudTd>
+            <MudTd DataLabel="Phone Number" Class="table-row">@context.CustomerPhoneNum</MudTd>
+            <MudTd DataLabel="Employee Name" Class="table-row">
+                @if (context.EmployeeUserName == "administrator")
+            {
+                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Info" Size="Size.Small">@context.EmployeeUserName.ToUpper()</MudChip>
+            }
+            else
+            {
+                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Success" Size="Size.Small">@context.EmployeeUserName.ToUpper()</MudChip>
+            }
+        </MudTd>
+        <MudTd DataLabel="DateTime" Class="table-row">@context.OrderDateTime</MudTd>
+            <MudTd DataLabel="Total Amount" Class="table-row">Rs.@context.OrderTotalAmount</MudTd>
+            <MudTd DataLabel="Discount Amount" Class="table-row">Rs.@context.DiscountAmount</MudTd>
+            <MudTd DataLabel="Grand Total" Class="table-row">Rs.@(context.OrderTotalAmount - context.DiscountAmount)</MudTd>
+        </RowTemplate>
+
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+
+    @code {
+    [CascadingParameter] private GlobalState _globalSate { get; set; }
+
+    private List<Order> _orders { get; set; } = new();
+
+    private bool dense = true;
+    private bool hover = true;
+    private bool striped = true;
+    private bool bordered = true;
+    private string searchString1 = "";
+
+    private IEnumerable<Order> Elements = new List<Order>();
+
+    protected override void OnInitialized()
+    {
+        Elements = OrderServices.GetOrdersFromJsonFile();
+        _globalSate.AppBarTitle = "Sales Transactions";
+    }
+
+    private bool FilterFunc1(Order element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(Order element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.OrderID.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.CustomerName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.CustomerPhoneNum.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.EmployeeUserName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.OrderDateTime.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.OrderTotalAmount.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.DiscountAmount.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+}

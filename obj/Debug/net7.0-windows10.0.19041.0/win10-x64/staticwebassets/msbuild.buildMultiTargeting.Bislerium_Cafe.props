@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Bislerium_Cafe.props" />
+</Project>

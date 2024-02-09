@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bislerium_Cafe", "Bislerium_Cafe.csproj", "{2AA15A3C-B14B-4712-8638-67BC9050855D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2AA15A3C-B14B-4712-8638-67BC9050855D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AA15A3C-B14B-4712-8638-67BC9050855D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AA15A3C-B14B-4712-8638-67BC9050855D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{2AA15A3C-B14B-4712-8638-67BC9050855D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AA15A3C-B14B-4712-8638-67BC9050855D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AA15A3C-B14B-4712-8638-67BC9050855D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F5CC789C-FFDD-4BB0-8EB0-4E0271617DBB}
+	EndGlobalSection
+EndGlobal

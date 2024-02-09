@@ -1,0 +1,105 @@
+@page "/addIn-items/{addInItemID}"
+@inject NavigationManager NavigationManager
+@inject AddInsServices AddInItemsServices
+@inject ISnackbar Snackbar
+
+<MudButton Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowBack" Class="mb-5" OnClick="goBack">
+    Back
+</MudButton>
+
+<h1>Edit Add-In Item Details</h1>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <MudAlert Severity="Severity.Error">@_errorMessage</MudAlert>
+}
+
+@if (_addInItem != null)
+{
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-6 d-flex flex-column gap-y-3">
+                <MudTextField @bind-Value="_currentPassword" Label="Current Password" Variant="Variant.Outlined" InputType="@InputType.Password"></MudTextField>
+                <MudTextField @bind-Value="_addInItem.Name" Label="Add-In Item Name" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value="_addInItem.Price" Label="Price" Variant="Variant.Outlined" InputType="@InputType.Number"></MudTextField>
+                <div>
+                    <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Warning" Class="mt-5" OnClick="handleUpdateAddInItemDetails">
+                        Update AddIns
+                    </MudButton>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <MudAlert Severity="Severity.Error">Invalid Coffee ID</MudAlert>
+}
+
+
+
+
+@code {
+    [Parameter]
+    public string addInItemID { get; set; }
+
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+    private string _errorMessage { get; set; } = "";
+
+    private AddIns _addInItem { get; set; }
+
+    private string _currentPassword { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _addInItem = AddInItemsServices.GetAddInItemDetailsByID(addInItemID);
+    }
+
+    protected void goBack()
+    {
+        NavigationManager.NavigateTo("/addIn-items");
+    }
+
+    protected void handleUpdateAddInItemDetails()
+    {
+        try
+        {
+            if (String.IsNullOrEmpty(_currentPassword))
+            {
+                _errorMessage = "Please enter your current password";
+                return;
+            }
+
+            if (String.IsNullOrEmpty(_addInItem.Name))
+            {
+                _errorMessage = "Please enter Add-In Item Name";
+                return;
+            }
+
+            if (_addInItem.Price <= 0)
+            {
+                _errorMessage = "Please enter valid price";
+                return;
+            }
+
+            if (_currentPassword != _globalState.CurrentUser.Password)
+            {
+                _errorMessage = "Invalid current password";
+                return;
+            }
+
+            AddInItemsServices.UpdateAddInItemDetails(_addInItem);
+
+            _errorMessage = "";
+            
+            Snackbar.Add("Add-In Item details updated successfully", Severity.Success);
+            goBack();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+        }
+    }
+}
